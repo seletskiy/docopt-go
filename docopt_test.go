@@ -159,7 +159,7 @@ func TestBogusDoc(t *testing.T) {
 }
 
 func TestHelpOnlyDoc(t *testing.T) {
-    doc := `Program only with Help Flags
+    doc := `Program only with Help Flags.
     Usage: prog.go -h | --help
 
     Options:
@@ -167,6 +167,25 @@ func TestHelpOnlyDoc(t *testing.T) {
 
     Blah blah blah.
 `
+
+    Docopt(doc)
+}
+
+func TestComplex(t *testing.T) {
+    doc := `Part of grep help message.
+
+    Usage: grep [options]
+
+    Options:
+        -m, --max-count=NUM       stop after NUM matches
+        -b, --byte-offset         print the byte offset with output lines
+        -n, --line-number         print line number with output lines
+            --line-buffered       flush output on every line
+        -H, --with-filename       print the file name for each match
+        -h, --no-filename         suppress the file name prefix on output
+            --label=LABEL         use LABEL as the standard input file name prefix
+        -o, --only-matching       show only the part of a line matching PATTERN
+        -q, --quiet, --silent     suppress all normal output`
 
     Docopt(doc)
 }

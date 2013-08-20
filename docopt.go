@@ -11,13 +11,14 @@ var _ = strings.Trim
 
 type Flag struct {
     names []string
-    has_arg bool
+    hasArg bool
+    desc string
 }
 
-type ShortFlag Flag
-type LongFlag Flag
-
-type PosArg string
+type PosArg struct {
+    name string
+    desc string
+}
 
 type MatchResult map[string]string
 
@@ -25,10 +26,27 @@ type Opt interface {
     Match(string, MatchResult) (MatchResult, error)
 }
 
-func ParseOpt(line string) (res Opt, err error) {
+func NewOpt(line string) *Opt {
     match := ReOptDesc.FindStringSubmatch(line)
+    flag := &Flag{names: make([]string, 0), hasArg: false}
+    optdesc := ReOptDescDelim.Split(match[0], -1)
 
-    return nil, nil
+    for i, opttext := range optdesc {
+        submatch := ReFlag.FindStringSubmatch(opttext)
+        if len(submatch) > 0 {
+            flag.names = append(flag.names, submatch[1])
+            if len(submatch[2]) > 0 {
+                flag.hasArg = true
+            }
+        } else {
+            flag.desc = strings.Join(optdesc[i:len(optdesc)], " ")
+            break
+        }
+    }
+
+    fmt.Printf("%q\n", flag)
+
+    return nil
 }
 
 type Group struct {
@@ -73,6 +91,6 @@ func parseOptions(opts string) {
 
     for _, line := range strings.Split(opts, "\n") {
         line = strings.Trim(line, " \t")
-        ParseOpt(line)
+        NewOpt(line)
     }
 }
