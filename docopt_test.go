@@ -1,191 +1,52 @@
 package docopt
 
 import (
-    "fmt"
-    "testing"
-    "strings"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-var _ = fmt.Printf
+func TestParseOptions_ParsesSingleOptionWithDescription(t *testing.T) {
+	test := assert.New(t)
 
-func TestEmptyUsage(t *testing.T) {
-    doc := `Test Empty Usage.
-    Usage: prog.go`
+	variants := []string{
+		`-a  An single option.`,
+		`-a   An single option.`,
+		`-a   An single option.`,
+		`-a   An single
+			   option.`,
+	}
 
-    sections := ReSections.FindStringSubmatch(doc)
+	expected := []Option{
+		{
+			Names:       []string{"-a"},
+			Description: `An single option.`,
+			LineNumber:  1,
+		},
+	}
 
-    if len(sections) != 3 {
-        t.Fatal(`can't split to 3 sections`)
-    }
+	for _, variant := range variants {
+		actual, err := ParseOptions(variant)
 
-    if sections[1] != "prog.go" {
-        t.Fatal(`usage section invalid`)
-    }
-
-    if sections[2] != "" {
-        t.Fatal(`options section invalid`)
-    }
-
-    res, err := Docopt(doc)
-
-    if err != nil || res != nil {
-        t.Fatal(`invalid result for empty usage`)
-    }
+		test.NoError(err)
+		test.EqualValues(expected, actual)
+	}
 }
 
-func TestAltUsage(t *testing.T) {
-    usages := `
-        prog.go -h
-        prog.go --help`
-    doc := `Test Alternative Usage.
-    Usage:` + usages
+func TestParseOptions_ParsesShortAndLongOptionWithDescription(t *testing.T) {
+	test := assert.New(t)
 
-    sections := ReSections.FindStringSubmatch(doc)
-    if len(sections) != 3 {
-        t.Fatal(`can't split to 3 section`)
-    }
+	section := `-a --an-option  An interesting option.`
 
-    if sections[1] != usages {
-        t.Fatal(`usage section invalid`)
-    }
-}
+	expected := []Option{
+		{
+			Names:       []string{"-a", "--an-option"},
+			Description: `An interesting option.`,
+			LineNumber:  1,
+		},
+	}
 
-func TestReSections(t *testing.T) {
-    usages := `
-        prog.go -h
-        prog.go --help`
-    options := `
-        -h --help  Show this message.`
-    doc := `Test Alternative Usage.
-    Usage:` + usages + `
-
-    Options:` + options
-
-    sections := ReSections.FindStringSubmatch(doc)
-    if len(sections) != 3 {
-        t.Fatal(`can't split to 3 section`)
-    }
-
-    if sections[1] != usages {
-        t.Fatal(`usage section invalid`)
-    }
-
-    if sections[2] != strings.Trim(options, "\n") {
-        t.Fatal(`options section invalid`)
-    }
-
-    doc = `Hello, I'm Bogus Test!`
-    sections = ReSections.FindStringSubmatch(doc)
-    if len(sections) != 0 {
-        t.Fatal(`shouldn't match bogus text`)
-    }
-}
-
-func TestReFlag(t *testing.T) {
-    res := ReFlag.FindStringSubmatch(`-h`)
-    if res[1] != `-h` {
-        t.Fatal(`can't parse -h flag`)
-    }
-
-    res = ReFlag.FindStringSubmatch(`-aAFTER`)
-    if res[1] != `-a` || res[2] != `AFTER` {
-        t.Fatal(`can't parse -aAFTER flag`)
-    }
-
-    res = ReFlag.FindStringSubmatch(`-a<after>`)
-    if res[1] != `-a` || res[2] != `<after>` {
-        t.Fatal(`can't parse -a<after> flag`)
-    }
-
-    res = ReFlag.FindStringSubmatch(`-a=AFTER`)
-    if res[1] != `-a` || res[2] != `AFTER` {
-        t.Fatal(`can't parse -a=AFTER flag`)
-    }
-
-    res = ReFlag.FindStringSubmatch(`--help`)
-    if res[1] != `--help` {
-        t.Fatal(`can't parse --help flag`)
-    }
-
-    res = ReFlag.FindStringSubmatch(`--before BEFORE`)
-    if res[1] != `--before` || res[2] != `BEFORE` {
-        t.Fatal(`can't parse --before BEFORE flag`)
-    }
-
-    res = ReFlag.FindStringSubmatch(`--before<before>`)
-    if res[1] != `--before` || res[2] != `<before>` {
-        t.Fatal(`can't parse --before<before> flag`)
-    }
-
-    res = ReFlag.FindStringSubmatch(`--before=<before>`)
-    if res[1] != `--before` || res[2] != `<before>` {
-        t.Fatal(`can't parse --before=<before> flag`)
-    }
-}
-
-func TestReOptDesc(t *testing.T) {
-    res := ReOptDesc.FindStringSubmatch(`-h  Show help message.`)
-    if res[1] != `-h` {
-        t.Fatal(`can't parse -h desc`)
-    }
-
-    res = ReOptDesc.FindStringSubmatch(`-h --help  Show help message.`)
-    if res[1] != `-h --help` {
-        t.Fatal(`can't parse -h --help desc`)
-    }
-
-    res = ReOptDesc.FindStringSubmatch(`-h, --help  Show help message.`)
-    if res[1] != `-h, --help` {
-        t.Fatal(`can't parse -h, --help desc`)
-    }
-
-    res = ReOptDesc.FindStringSubmatch(`-A AFTER, --after AFTER  Some desc.`)
-    if res[1] != `-A AFTER, --after AFTER` {
-        t.Fatal(`can't parse -A AFTER, --after AFTER desc`)
-    }
-}
-
-func TestBogusDoc(t *testing.T) {
-    defer func() {
-        p := recover()
-        if p != `"Usage:" (case-insensetive) not found in help text` {
-            t.Fatal(`unexpected panic`)
-        }
-    }()
-
-    Docopt(`I'm Bogus Help Text!`)
-
-    t.Fatal(`shouldn't reach this point`)
-}
-
-func TestHelpOnlyDoc(t *testing.T) {
-    doc := `Program only with Help Flags.
-    Usage: prog.go -h | --help
-
-    Options:
-        -h --help  Show this help
-
-    Blah blah blah.
-`
-
-    Docopt(doc)
-}
-
-func TestComplex(t *testing.T) {
-    doc := `Part of grep help message.
-
-    Usage: grep [options]
-
-    Options:
-        -m, --max-count=NUM       stop after NUM matches
-        -b, --byte-offset         print the byte offset with output lines
-        -n, --line-number         print line number with output lines
-            --line-buffered       flush output on every line
-        -H, --with-filename       print the file name for each match
-        -h, --no-filename         suppress the file name prefix on output
-            --label=LABEL         use LABEL as the standard input file name prefix
-        -o, --only-matching       show only the part of a line matching PATTERN
-        -q, --quiet, --silent     suppress all normal output`
-
-    Docopt(doc)
+	actual, err := ParseOptions(section)
+	test.NoError(err)
+	test.EqualValues(expected, actual)
 }
