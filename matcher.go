@@ -10,13 +10,18 @@ type Matcher struct {
 }
 
 func NewMatcher(expression string, parts ...interface{}) Matcher {
-	return Matcher{regexp.MustCompile(`^` + fmt.Sprintf(expression, parts...))}
+	return Matcher{regexp.MustCompile(fmt.Sprintf(expression, parts...))}
 }
 
 func (matcher *Matcher) Match(body string) ([]string, string) {
-	matches := matcher.FindStringSubmatch(body)
-	if matches != nil {
-		return matches, body[len(matches[0]):]
+	//matches := matcher.FindStringSubmatch(body)
+	index := matcher.FindStringIndex(body)
+	if index != nil {
+		if index[0] != 0 {
+			return nil, body
+		}
+
+		return matcher.FindStringSubmatch(body), body[index[1]:]
 	}
 
 	return nil, body

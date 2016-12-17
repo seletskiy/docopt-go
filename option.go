@@ -1,90 +1,46 @@
 package docopt
 
 import (
-	"bufio"
-	"bytes"
+	"strings"
 )
 
 type Option struct {
 	Names       []string
-	Default     string
 	Value       string
-	Description string
+	Description []string
 	Placeholder string
-	IndentLevel int
-	LineNumber  int
+	Level       int
 }
 
-func ParseOptions(section string) ([]Option, error) {
-	scanner := bufio.NewScanner(bytes.NewBufferString(section))
+func (option *Option) GetDescription() string {
+	var description string
 
-	var (
-		option  *Option
-		options []Option
-		index   int
-	)
-
-	for scanner.Scan() {
-		index += 1
-
-		line := scanner.Text()
-
-		matches, tail := MatcherIndenting.Match(line)
-
-		indenting := matches[1]
-
-		for {
-			matches, tail = MatcherOption.Match(tail)
-			if matches == nil {
-				break
-			}
-
-			if option != nil && option.LineNumber != index {
-				option = nil
-			}
-
-			if option == nil {
-				options = append(options, Option{
-					IndentLevel: len(indenting),
-					LineNumber:  index,
-				})
-
-				option = &options[len(options)-1]
-			}
-
-			option.Names = append(option.Names, matches[1])
-
-			if matches[2] != "" {
-				option.Placeholder = matches[2]
-			}
-
-			matches, tail = MatcherDescriptionSeparator.Match(tail)
-			if matches != nil {
-				break
-			}
-
-			matches, tail = MatcherOptionSeparator.Match(tail)
-			if matches == nil {
-				return nil, ErrParseFailed{
-					Message: `expected two or more spaces or option ` +
-						`definition, but none found`,
-
-					Line: line,
-					Tail: tail,
-
-					LineNumber: index,
-				}
-			}
+	for _, line := range option.Description {
+		if description == "" {
+			description = line
+			continue
 		}
 
-		if option != nil {
-			if option.LineNumber != index {
-				option.Description += " "
-			}
-
-			option.Description += tail
+		if sign, _ := MatcherDescriptionParagraph.Match(line); sign != nil {
+			description += "\n" + line
+		} else {
+			description += " " + line
 		}
 	}
 
-	return options, nil
+	return strings.TrimSpace(description)
+}
+
+func (option *Option) HasArgument() bool {
+	return option.Placeholder != ""
+}
+
+func (option *Option) GetDefault() (string, bool) {
+	matches, _ := MatcherDescriptionDefault.Match(option.GetDescription())
+
+	if matches == nil {
+		return "", false
+	}
+
+	return matches[1], true
 }
