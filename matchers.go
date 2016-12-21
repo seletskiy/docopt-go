@@ -12,8 +12,13 @@ var (
 		`(<[^>]+>|[[:upper:]]+)`,
 	)
 
+	MatcherOptionNameSet = NewMatcher(
+		`[^ =<|\])]`,
+	)
+
 	MatcherOptionName = NewMatcher(
-		`(--[^ =<|]+|-[^ =<|])`,
+		`(--%[1]s+|-%[1]s)`,
+		MatcherOptionNameSet,
 	)
 
 	MatcherOption = NewMatcher(
@@ -40,10 +45,6 @@ var (
 
 	MatcherDescriptionDefault = NewMatcher(
 		`(?s)(?:.*)\[default: ([^\]]+)]`,
-	)
-
-	MatcherUsageWord = NewMatcher(
-		`\S+`,
 	)
 
 	MatcherTokenSeparator = NewMatcher(
@@ -76,5 +77,10 @@ var (
 
 	MatcherTokenRepeat = NewMatcher(
 		`\.\.\.`,
+	)
+
+	MatcherTokenWord = NewMatcher(
+		`([^ \t([\])<>|.-]%[1]s*)`,
+		MatcherOptionNameSet,
 	)
 )

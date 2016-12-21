@@ -5,7 +5,10 @@ type UsageParser struct{}
 func (parser *UsageParser) Parse(section string) (*Usage, error) {
 	scanner := NewScanner(section)
 
-	usage := &Usage{}
+	var (
+		usage   Usage
+		grammar *Grammar
+	)
 
 	for scanner.Scan() {
 		scanner.Match(MatcherIndenting)
@@ -14,18 +17,28 @@ func (parser *UsageParser) Parse(section string) (*Usage, error) {
 			continue
 		}
 
-		matches := scanner.Match(MatcherUsageWord)
+		matches := scanner.Match(MatcherTokenWord)
 		if matches != nil {
 			if usage.Binary == "" {
 				usage.Binary = matches[0]
+			}
 
-				matches = nil
+			if usage.Binary == matches[0] {
+				usage.Variants = append(usage.Variants, Grammar{})
+
+				grammar = &usage.Variants[len(usage.Variants)-1]
+			} else {
+				*grammar = append(*grammar, TokenStaticWord{
+					Name: matches[0],
+				})
 			}
 		}
 
-		scanner.Match(MatcherTokenSeparator)
-
-		grammar := Grammar{}
+		if usage.Binary == "" {
+			return nil, scanner.Errorf(
+				`expected binary name`,
+			)
+		}
 
 		for {
 			tokens, err := parser.parseTokens(scanner)
@@ -33,64 +46,25 @@ func (parser *UsageParser) Parse(section string) (*Usage, error) {
 				return nil, err
 			}
 
-			if token == nil {
+			if tokens == nil {
 				break
 			}
 
-			grammar = append(grammar, token)
+			*grammar = append(*grammar, tokens...)
 		}
-
-		usage.Variants = append(usage.Variants, grammar)
 	}
 
-	return usage, nil
+	return &usage, nil
 }
 
-func (parser *UsageParser) parseToken(scanner *Scanner) ([]Token, error) {
+func (parser *UsageParser) parseTokens(scanner *Scanner) ([]Token, error) {
+	scanner.Match(MatcherTokenSeparator)
+
 	if scanner.Match(MatcherEndOfLine) != nil {
 		return nil, nil
 	}
 
 	tokens := []Token{}
-
-	matches := scanner.Match(MatcherOption)
-	if matches != nil {
-		tokens = append(tokens, TokenOption{
-			Name:        matches[1],
-			Placeholder: matches[2],
-		})
-	}
-
-	matches = scanner.Match(MatcherArgument)
-	if matches != nil {
-		tokens = append(tokens, TokenPositionalArgument{
-			Placeholder: matches[1],
-		})
-	}
-
-	if scanner.Match(MatcherTokenRequiredGroupEnd) != nil {
-		tokens = append(tokens, TokenGroup{
-			Opened:   false,
-			Required: true,
-		})
-	}
-
-	if scanner.Match(MatcherTokenOptionalGroupEnd) != nil {
-		tokens = append(tokens, TokenGroup{
-			Opened:   false,
-			Required: false,
-		})
-	}
-
-	if scanner.Match(MatcherTokenRepeat) != nil {
-		tokens = append(tokens, TokenRepeat{})
-	}
-
-	scanner.Match(MatcherTokenSeparator)
-
-	if scanner.Match(MatcherTokenBranch) != nil {
-		tokens = append(tokens, TokenBranch{})
-	}
 
 	if scanner.Match(MatcherTokenRequiredGroupStart) != nil {
 		tokens = append(tokens, TokenGroup{
@@ -106,8 +80,90 @@ func (parser *UsageParser) parseToken(scanner *Scanner) ([]Token, error) {
 		})
 	}
 
-	return nil, scanner.Errorf(
-		`expected option, argument, one of "|()[]", "...", ` +
-			`but none found`,
-	)
+	empty := false
+	if len(tokens) > 0 {
+		empty = true
+	}
+
+	scanner.Match(MatcherTokenSeparator)
+
+	matches := scanner.Match(MatcherOption)
+	if matches != nil {
+		empty = false
+
+		tokens = append(tokens, TokenOption{
+			Name:        matches[1],
+			Placeholder: matches[2],
+		})
+	}
+
+	matches = scanner.Match(MatcherArgument)
+	if matches != nil {
+		empty = false
+
+		tokens = append(tokens, TokenPositionalArgument{
+			Placeholder: matches[1],
+		})
+	}
+
+	matches = scanner.Match(MatcherTokenWord)
+	if matches != nil {
+		empty = false
+
+		tokens = append(tokens, TokenStaticWord{
+			Name: matches[0],
+		})
+	}
+
+	if len(tokens) == 0 {
+		return nil, scanner.Errorf(
+			`static word, option or argument expected`,
+		)
+	}
+
+	if empty {
+		return nil, scanner.Errorf(
+			`empty groups not allowed`,
+		)
+	}
+
+	scanner.Match(MatcherTokenSeparator)
+
+	if scanner.Match(MatcherTokenRequiredGroupEnd) != nil {
+		tokens = append(tokens, TokenGroup{
+			Opened:   false,
+			Required: true,
+		})
+	}
+
+	if scanner.Match(MatcherTokenOptionalGroupEnd) != nil {
+		tokens = append(tokens, TokenGroup{
+			Opened:   false,
+			Required: false,
+		})
+	}
+
+	if len(tokens) == 0 {
+		return nil, scanner.Errorf(
+			`")" or "]" expected`,
+		)
+	}
+
+	if scanner.Match(MatcherTokenRepeat) != nil {
+		tokens = append(tokens, TokenRepeat{})
+	}
+
+	scanner.Match(MatcherTokenSeparator)
+
+	if scanner.Match(MatcherTokenBranch) != nil {
+		tokens = append(tokens, TokenBranch{})
+	}
+
+	if len(tokens) == 0 {
+		return nil, scanner.Errorf(
+			`"..." or "|" expected`,
+		)
+	}
+
+	return tokens, nil
 }
