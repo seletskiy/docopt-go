@@ -366,3 +366,26 @@ func TestParseUsage_ParsesMultilineUsageStartedWithStaticWord(t *testing.T) {
 		test.EqualValues(expected, actual)
 	}
 }
+
+func TestParseUsage_ParsesComplexArgumentPatterns(t *testing.T) {
+	test := assert.New(t)
+
+	section := `blah action /<search>`
+
+	expected := &Usage{
+		Binary: "blah",
+		Variants: []Grammar{
+			{
+				TokenStaticWord{Name: "action"},
+				TokenPositionalArgument{Placeholder: "/<search>"},
+			},
+		},
+	}
+
+	parser := &UsageParser{}
+
+	actual, err := parser.Parse(section)
+
+	test.NoError(err)
+	test.EqualValues(expected, actual)
+}

@@ -58,15 +58,21 @@ func (parser *UsageParser) Parse(section string) (*Usage, error) {
 }
 
 func (parser *UsageParser) parseTokens(scanner *Scanner) ([]Token, error) {
-	scanner.Match(MatcherTokenSeparator)
+	tokens := []Token{}
+
+	if scanner.Match(MatcherTokenSeparator) != nil {
+		tokens = append(tokens, TokenWhitespace{})
+	}
 
 	if scanner.Match(MatcherEndOfLine) != nil {
 		return nil, nil
 	}
 
-	tokens := []Token{}
+	empty := false
 
 	if scanner.Match(MatcherTokenRequiredGroupStart) != nil {
+		empty = true
+
 		tokens = append(tokens, TokenGroup{
 			Opened:   true,
 			Required: true,
@@ -74,15 +80,12 @@ func (parser *UsageParser) parseTokens(scanner *Scanner) ([]Token, error) {
 	}
 
 	if scanner.Match(MatcherTokenOptionalGroupStart) != nil {
+		empty = true
+
 		tokens = append(tokens, TokenGroup{
 			Opened:   true,
 			Required: false,
 		})
-	}
-
-	empty := false
-	if len(tokens) > 0 {
-		empty = true
 	}
 
 	scanner.Match(MatcherTokenSeparator)

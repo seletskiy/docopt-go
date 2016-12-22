@@ -14,7 +14,6 @@ func NewMatcher(expression string, parts ...interface{}) Matcher {
 }
 
 func (matcher *Matcher) Match(body string) ([]string, string) {
-	//matches := matcher.FindStringSubmatch(body)
 	index := matcher.FindStringIndex(body)
 	if index != nil {
 		if index[0] != 0 {
