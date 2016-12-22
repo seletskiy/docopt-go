@@ -1,6 +1,8 @@
 package docopt
 
-func ParseOptions(section string) ([]Option, error) {
+type OptionsParser struct{}
+
+func (parser *OptionsParser) Parse(section string) ([]Option, error) {
 	scanner := NewScanner(section)
 
 	var (
@@ -41,8 +43,11 @@ func ParseOptions(section string) ([]Option, error) {
 				option.Placeholder = matches[2]
 			}
 
-			matches = scanner.Match(MatcherDescriptionSeparator)
-			if matches != nil {
+			if scanner.Match(MatcherDescriptionSeparator) != nil {
+				break
+			}
+
+			if scanner.Match(MatcherEndOfLine) != nil {
 				break
 			}
 

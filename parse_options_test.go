@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestParseOptions_ParsesSingleOptionWithDescription(t *testing.T) {
+func Test_OptionsParser_ParsesSingleOptionWithDescription(t *testing.T) {
 	test := assert.New(t)
 
 	variants := []string{
@@ -21,15 +21,17 @@ func TestParseOptions_ParsesSingleOptionWithDescription(t *testing.T) {
 		},
 	}
 
+	parser := OptionsParser{}
+
 	for _, variant := range variants {
-		actual, err := ParseOptions(variant)
+		actual, err := parser.Parse(variant)
 
 		test.NoError(err)
 		test.EqualValues(expected, actual)
 	}
 }
 
-func TestParseOptions_ParsesShortAndLongOptionWithDescription(t *testing.T) {
+func Test_OptionsParser_ParsesShortAndLongOptionWithDescription(t *testing.T) {
 	test := assert.New(t)
 
 	section := `-a --an-option  An interesting option.`
@@ -41,12 +43,15 @@ func TestParseOptions_ParsesShortAndLongOptionWithDescription(t *testing.T) {
 		},
 	}
 
-	actual, err := ParseOptions(section)
+	parser := OptionsParser{}
+
+	actual, err := parser.Parse(section)
+
 	test.NoError(err)
 	test.EqualValues(expected, actual)
 }
 
-func TestParseOptions_JoinsDescriptionOnSeveralLines(t *testing.T) {
+func Test_OptionsParser_JoinsDescriptionOnSeveralLines(t *testing.T) {
 	test := assert.New(t)
 
 	variants := []string{
@@ -61,8 +66,10 @@ func TestParseOptions_JoinsDescriptionOnSeveralLines(t *testing.T) {
 		      option.`,
 	}
 
+	parser := OptionsParser{}
+
 	for _, variant := range variants {
-		actual, err := ParseOptions(variant)
+		actual, err := parser.Parse(variant)
 
 		test.NoError(err)
 		test.Len(actual, 1)
@@ -70,7 +77,29 @@ func TestParseOptions_JoinsDescriptionOnSeveralLines(t *testing.T) {
 	}
 }
 
-func TestParseOptions_ParsesPlaceholderForShortOption(t *testing.T) {
+func Test_OptionsParser_ParsesDescriptionOnNewLine(t *testing.T) {
+	test := assert.New(t)
+
+	variants := []string{
+		`-a
+			An single option.`,
+		`-a
+			An single
+			option.`,
+	}
+
+	parser := OptionsParser{}
+
+	for _, variant := range variants {
+		actual, err := parser.Parse(variant)
+
+		test.NoError(err)
+		test.Len(actual, 1)
+		test.EqualValues(actual[0].GetDescription(), `An single option.`)
+	}
+}
+
+func Test_OptionsParser_ParsesPlaceholderForShortOption(t *testing.T) {
 	test := assert.New(t)
 
 	variants := []string{
@@ -82,8 +111,10 @@ func TestParseOptions_ParsesPlaceholderForShortOption(t *testing.T) {
 		`-aVALUE     Option with value.`,
 	}
 
+	parser := OptionsParser{}
+
 	for _, variant := range variants {
-		actual, err := ParseOptions(variant)
+		actual, err := parser.Parse(variant)
 
 		test.NoError(err)
 		test.Len(actual, 1)
@@ -91,7 +122,7 @@ func TestParseOptions_ParsesPlaceholderForShortOption(t *testing.T) {
 	}
 }
 
-func TestParseOptions_ParsesPlaceholderForOptionWithAliases(t *testing.T) {
+func Test_OptionsParser_ParsesPlaceholderForOptionWithAliases(t *testing.T) {
 	test := assert.New(t)
 
 	variants := []string{
@@ -102,8 +133,10 @@ func TestParseOptions_ParsesPlaceholderForOptionWithAliases(t *testing.T) {
 		`-a --an-option=VALUE    Option with value.`,
 	}
 
+	parser := OptionsParser{}
+
 	for _, variant := range variants {
-		actual, err := ParseOptions(variant)
+		actual, err := parser.Parse(variant)
 
 		test.NoError(err)
 		test.Len(actual, 1)
@@ -111,7 +144,7 @@ func TestParseOptions_ParsesPlaceholderForOptionWithAliases(t *testing.T) {
 	}
 }
 
-func TestParseOptions_ParsesOptionDefaultValue(t *testing.T) {
+func Test_OptionsParser_ParsesOptionDefaultValue(t *testing.T) {
 	test := assert.New(t)
 
 	variants := []string{
@@ -120,8 +153,10 @@ func TestParseOptions_ParsesOptionDefaultValue(t *testing.T) {
 					 [default: some].`,
 	}
 
+	parser := OptionsParser{}
+
 	for _, variant := range variants {
-		actual, err := ParseOptions(variant)
+		actual, err := parser.Parse(variant)
 
 		test.NoError(err)
 		test.Len(actual, 1)
@@ -133,7 +168,7 @@ func TestParseOptions_ParsesOptionDefaultValue(t *testing.T) {
 	}
 }
 
-func TestParseOptions_ParsesSeveralOptions(t *testing.T) {
+func Test_OptionsParser_ParsesSeveralOptions(t *testing.T) {
 	test := assert.New(t)
 
 	section := `
@@ -145,7 +180,9 @@ func TestParseOptions_ParsesSeveralOptions(t *testing.T) {
 		                         [default: xxx]
 	`
 
-	options, err := ParseOptions(section)
+	parser := OptionsParser{}
+
+	options, err := parser.Parse(section)
 	test.NoError(err)
 	test.Len(options, 3)
 

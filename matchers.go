@@ -13,7 +13,7 @@ var (
 	)
 
 	MatcherOptionNameSet = NewMatcher(
-		`[^ =<|\])]`,
+		`[^ =<|[\]()]`,
 	)
 
 	MatcherOptionName = NewMatcher(
@@ -80,7 +80,7 @@ var (
 	)
 
 	MatcherTokenWord = NewMatcher(
-		`([^ \t([\])<>|.-]%[1]s*)`,
+		`([^ \t([[\]()<>|.-]%[1]s*)`,
 		MatcherOptionNameSet,
 	)
 )

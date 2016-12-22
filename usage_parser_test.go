@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestParseUsage_ParsesEmptyUsage(t *testing.T) {
+func Test_UsageParser_ParsesEmptyUsage(t *testing.T) {
 	test := assert.New(t)
 
 	variants := []string{
@@ -30,7 +30,7 @@ func TestParseUsage_ParsesEmptyUsage(t *testing.T) {
 	}
 }
 
-func TestParseUsage_ParsesUsageWithSingleOption(t *testing.T) {
+func Test_UsageParser_ParsesUsageWithSingleOption(t *testing.T) {
 	test := assert.New(t)
 
 	variants := []string{
@@ -56,7 +56,7 @@ func TestParseUsage_ParsesUsageWithSingleOption(t *testing.T) {
 	}
 }
 
-func TestParseUsage_ParsesUsageWithSingleBranch(t *testing.T) {
+func Test_UsageParser_ParsesUsageWithSingleBranch(t *testing.T) {
 	test := assert.New(t)
 
 	variants := []string{
@@ -87,7 +87,7 @@ func TestParseUsage_ParsesUsageWithSingleBranch(t *testing.T) {
 	}
 }
 
-func TestParseUsage_ParsesUsageWithRepeat(t *testing.T) {
+func Test_UsageParser_ParsesUsageWithRepeat(t *testing.T) {
 	test := assert.New(t)
 
 	variants := []string{
@@ -117,7 +117,7 @@ func TestParseUsage_ParsesUsageWithRepeat(t *testing.T) {
 	}
 }
 
-func TestParseUsage_ParsesUsageWithRequiredGroup(t *testing.T) {
+func Test_UsageParser_ParsesUsageWithRequiredGroup(t *testing.T) {
 	test := assert.New(t)
 
 	variants := []string{
@@ -150,7 +150,7 @@ func TestParseUsage_ParsesUsageWithRequiredGroup(t *testing.T) {
 	}
 }
 
-func TestParseUsage_ParsesUsageWithStaticWord(t *testing.T) {
+func Test_UsageParser_ParsesUsageWithStaticWord(t *testing.T) {
 	test := assert.New(t)
 
 	variants := []string{
@@ -164,6 +164,7 @@ func TestParseUsage_ParsesUsageWithStaticWord(t *testing.T) {
 		Variants: []Grammar{
 			{
 				TokenStaticWord{Name: `action`},
+				TokenSeparator{},
 				TokenPositionalArgument{Placeholder: "<value>"},
 			},
 		},
@@ -179,7 +180,7 @@ func TestParseUsage_ParsesUsageWithStaticWord(t *testing.T) {
 	}
 }
 
-func TestParseUsage_ParsesUsageWithStaticWordsGroup(t *testing.T) {
+func Test_UsageParser_ParsesUsageWithStaticWordsGroup(t *testing.T) {
 	test := assert.New(t)
 
 	variants := []string{
@@ -211,7 +212,7 @@ func TestParseUsage_ParsesUsageWithStaticWordsGroup(t *testing.T) {
 	}
 }
 
-func TestParseUsage_ProhibitsEmptyGroup(t *testing.T) {
+func Test_UsageParser_ProhibitsEmptyGroup(t *testing.T) {
 	test := assert.New(t)
 
 	variants := []string{
@@ -229,7 +230,7 @@ func TestParseUsage_ProhibitsEmptyGroup(t *testing.T) {
 	}
 }
 
-func TestParseUsage_ProhibitsEmptyBranch(t *testing.T) {
+func Test_UsageParser_ProhibitsEmptyBranch(t *testing.T) {
 	test := assert.New(t)
 
 	variants := []string{
@@ -247,7 +248,7 @@ func TestParseUsage_ProhibitsEmptyBranch(t *testing.T) {
 	}
 }
 
-func TestParseUsage_ProhibitsEmptyRepeat(t *testing.T) {
+func Test_UsageParser_ProhibitsEmptyRepeat(t *testing.T) {
 	test := assert.New(t)
 
 	variants := []string{
@@ -266,7 +267,7 @@ func TestParseUsage_ProhibitsEmptyRepeat(t *testing.T) {
 	}
 }
 
-func TestParseUsage_ParsesUsageWithSeveralUsages(t *testing.T) {
+func Test_UsageParser_ParsesUsageWithSeveralUsages(t *testing.T) {
 	test := assert.New(t)
 
 	variants := []string{
@@ -292,7 +293,7 @@ func TestParseUsage_ParsesUsageWithSeveralUsages(t *testing.T) {
 	}
 }
 
-func TestParseUsage_ParsesMultilineUsage(t *testing.T) {
+func Test_UsageParser_ParsesMultilineUsage(t *testing.T) {
 	test := assert.New(t)
 
 	variants := []string{
@@ -305,6 +306,7 @@ func TestParseUsage_ParsesMultilineUsage(t *testing.T) {
 		Variants: []Grammar{
 			{
 				TokenOption{Name: "--help"},
+				TokenSeparator{},
 				TokenOption{Name: "--version"},
 			},
 		},
@@ -320,7 +322,7 @@ func TestParseUsage_ParsesMultilineUsage(t *testing.T) {
 	}
 }
 
-func TestParseUsage_ProhibitsUsageWithoutBinaryName(t *testing.T) {
+func Test_UsageParser_ProhibitsUsageWithoutBinaryName(t *testing.T) {
 	test := assert.New(t)
 
 	variants := []string{
@@ -337,7 +339,7 @@ func TestParseUsage_ProhibitsUsageWithoutBinaryName(t *testing.T) {
 	}
 }
 
-func TestParseUsage_ParsesMultilineUsageStartedWithStaticWord(t *testing.T) {
+func Test_UsageParser_ParsesMultilineUsageStartedWithStaticWord(t *testing.T) {
 	test := assert.New(t)
 
 	variants := []string{
@@ -350,8 +352,11 @@ func TestParseUsage_ParsesMultilineUsageStartedWithStaticWord(t *testing.T) {
 		Variants: []Grammar{
 			{
 				TokenStaticWord{Name: "action"},
+				TokenSeparator{},
 				TokenPositionalArgument{Placeholder: "<action>"},
+				TokenSeparator{},
 				TokenStaticWord{Name: "value"},
+				TokenSeparator{},
 				TokenPositionalArgument{Placeholder: "<value>"},
 			},
 		},
@@ -367,7 +372,7 @@ func TestParseUsage_ParsesMultilineUsageStartedWithStaticWord(t *testing.T) {
 	}
 }
 
-func TestParseUsage_ParsesComplexArgumentPatterns(t *testing.T) {
+func Test_UsageParser_ParsesComplexArgumentPatterns(t *testing.T) {
 	test := assert.New(t)
 
 	section := `blah action /<search>`
@@ -377,7 +382,37 @@ func TestParseUsage_ParsesComplexArgumentPatterns(t *testing.T) {
 		Variants: []Grammar{
 			{
 				TokenStaticWord{Name: "action"},
-				TokenPositionalArgument{Placeholder: "/<search>"},
+				TokenSeparator{},
+				TokenStaticWord{Name: "/"},
+				TokenPositionalArgument{Placeholder: "<search>"},
+			},
+		},
+	}
+
+	parser := &UsageParser{}
+
+	actual, err := parser.Parse(section)
+
+	test.NoError(err)
+	test.EqualValues(expected, actual)
+}
+
+func Test_UsageParser_ParsesComplexArgumentPatternsWithGroups(t *testing.T) {
+	test := assert.New(t)
+
+	section := `blah action key[=<value>]`
+
+	expected := &Usage{
+		Binary: "blah",
+		Variants: []Grammar{
+			{
+				TokenStaticWord{Name: "action"},
+				TokenSeparator{},
+				TokenStaticWord{Name: "key"},
+				TokenGroup{Opened: true},
+				TokenStaticWord{Name: "="},
+				TokenPositionalArgument{Placeholder: "<value>"},
+				TokenGroup{Opened: false},
 			},
 		},
 	}
