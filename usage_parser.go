@@ -138,15 +138,15 @@ func (parser *UsageParser) parseTokensOptions(
 	matches := scanner.Match(MatcherOption)
 	if matches != nil {
 		tokens = append(tokens, TokenOption{
-			Name:        matches[1],
-			Placeholder: matches[2],
+			Name:  matches[1],
+			Value: matches[2],
 		})
 	}
 
 	matches = scanner.Match(MatcherArgument)
 	if matches != nil {
 		tokens = append(tokens, TokenPositionalArgument{
-			Placeholder: matches[1],
+			Value: matches[1],
 		})
 	}
 

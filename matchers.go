@@ -16,14 +16,19 @@ var (
 		`[^ =<|[\]()]`,
 	)
 
+	MatcherOptionValueSeparator = NewMatcher(
+		`[= ]`,
+	)
+
 	MatcherOptionName = NewMatcher(
 		`(--%[1]s+|-%[1]s)`,
 		MatcherOptionNameSet,
 	)
 
 	MatcherOption = NewMatcher(
-		`%[1]s(?:[= ]?%[2]s)?`,
+		`%[1]s(?:%[2]s?%[3]s)?`,
 		MatcherOptionName,
+		MatcherOptionValueSeparator,
 		MatcherArgument,
 	)
 
@@ -82,5 +87,9 @@ var (
 	MatcherTokenWord = NewMatcher(
 		`([^ \t([[\]()<>|.-]%[1]s*)`,
 		MatcherOptionNameSet,
+	)
+
+	MatcherAny = NewMatcher(
+		`.+`,
 	)
 )

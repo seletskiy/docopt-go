@@ -6,9 +6,8 @@ import (
 
 type Option struct {
 	Names       []string
-	Value       string
 	Description []string
-	Placeholder string
+	Value       string
 	Level       int
 }
 
@@ -32,7 +31,7 @@ func (option *Option) GetDescription() string {
 }
 
 func (option *Option) HasArgument() bool {
-	return option.Placeholder != ""
+	return option.Value != ""
 }
 
 func (option *Option) GetDefault() (string, bool) {

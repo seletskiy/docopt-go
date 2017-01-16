@@ -99,7 +99,7 @@ func Test_OptionsParser_ParsesDescriptionOnNewLine(t *testing.T) {
 	}
 }
 
-func Test_OptionsParser_ParsesPlaceholderForShortOption(t *testing.T) {
+func Test_OptionsParser_ParsesValueForShortOption(t *testing.T) {
 	test := assert.New(t)
 
 	variants := []string{
@@ -122,7 +122,7 @@ func Test_OptionsParser_ParsesPlaceholderForShortOption(t *testing.T) {
 	}
 }
 
-func Test_OptionsParser_ParsesPlaceholderForOptionWithAliases(t *testing.T) {
+func Test_OptionsParser_ParsesValueForOptionWithAliases(t *testing.T) {
 	test := assert.New(t)
 
 	variants := []string{
@@ -196,5 +196,5 @@ func Test_OptionsParser_ParsesSeveralOptions(t *testing.T) {
 
 	test.True(options[2].HasArgument())
 	test.EqualValues([]string{`-x`, `--with-value`}, options[2].Names)
-	test.EqualValues(`<value>`, options[2].Placeholder)
+	test.EqualValues(`<value>`, options[2].Value)
 }

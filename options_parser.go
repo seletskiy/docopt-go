@@ -40,7 +40,7 @@ func (parser *OptionsParser) Parse(section string) ([]Option, error) {
 			option.Names = append(option.Names, matches[1])
 
 			if matches[2] != "" {
-				option.Placeholder = matches[2]
+				option.Value = matches[2]
 			}
 
 			if scanner.Match(MatcherDescriptionSeparator) != nil {

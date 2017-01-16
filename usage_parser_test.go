@@ -165,7 +165,7 @@ func Test_UsageParser_ParsesUsageWithStaticWord(t *testing.T) {
 			{
 				TokenStaticWord{Name: `action`},
 				TokenSeparator{},
-				TokenPositionalArgument{Placeholder: "<value>"},
+				TokenPositionalArgument{Value: "<value>"},
 			},
 		},
 	}
@@ -353,11 +353,11 @@ func Test_UsageParser_ParsesMultilineUsageStartedWithStaticWord(t *testing.T) {
 			{
 				TokenStaticWord{Name: "action"},
 				TokenSeparator{},
-				TokenPositionalArgument{Placeholder: "<action>"},
+				TokenPositionalArgument{Value: "<action>"},
 				TokenSeparator{},
 				TokenStaticWord{Name: "value"},
 				TokenSeparator{},
-				TokenPositionalArgument{Placeholder: "<value>"},
+				TokenPositionalArgument{Value: "<value>"},
 			},
 		},
 	}
@@ -384,7 +384,7 @@ func Test_UsageParser_ParsesComplexArgumentPatterns(t *testing.T) {
 				TokenStaticWord{Name: "action"},
 				TokenSeparator{},
 				TokenStaticWord{Name: "/"},
-				TokenPositionalArgument{Placeholder: "<search>"},
+				TokenPositionalArgument{Value: "<search>"},
 			},
 		},
 	}
@@ -411,7 +411,7 @@ func Test_UsageParser_ParsesComplexArgumentPatternsWithGroups(t *testing.T) {
 				TokenStaticWord{Name: "key"},
 				TokenGroup{Opened: true},
 				TokenStaticWord{Name: "="},
-				TokenPositionalArgument{Placeholder: "<value>"},
+				TokenPositionalArgument{Value: "<value>"},
 				TokenGroup{Opened: false},
 			},
 		},

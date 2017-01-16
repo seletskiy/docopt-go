@@ -1,5 +1,5 @@
 package docopt
 
 type TokenPositionalArgument struct {
-	Placeholder string
+	Value string
 }
