@@ -42,7 +42,7 @@ func Test_UsageParser_ParsesUsageWithSingleOption(t *testing.T) {
 	expected := &Usage{
 		Binary: "blah",
 		Variants: []Grammar{
-			{TokenOption{Name: "--help"}},
+			{&TokenOption{Name: "--help"}},
 		},
 	}
 
@@ -70,9 +70,9 @@ func Test_UsageParser_ParsesUsageWithSingleBranch(t *testing.T) {
 		Binary: "blah",
 		Variants: []Grammar{
 			{
-				TokenOption{Name: "--help"},
-				TokenBranch{},
-				TokenOption{Name: "-h"},
+				&TokenOption{Name: "--help"},
+				&TokenBranch{},
+				&TokenOption{Name: "-h"},
 			},
 		},
 	}
@@ -101,8 +101,8 @@ func Test_UsageParser_ParsesUsageWithRepeat(t *testing.T) {
 		Binary: "blah",
 		Variants: []Grammar{
 			{
-				TokenOption{Name: "-v"},
-				TokenRepeat{},
+				&TokenOption{Name: "-v"},
+				&TokenRepeat{},
 			},
 		},
 	}
@@ -131,11 +131,11 @@ func Test_UsageParser_ParsesUsageWithRequiredGroup(t *testing.T) {
 		Binary: "blah",
 		Variants: []Grammar{
 			{
-				TokenGroup{Required: true, Opened: true},
-				TokenOption{Name: "--run"},
-				TokenBranch{},
-				TokenOption{Name: "--test"},
-				TokenGroup{Required: true},
+				&TokenGroup{Required: true, Opened: true},
+				&TokenOption{Name: "--run"},
+				&TokenBranch{},
+				&TokenOption{Name: "--test"},
+				&TokenGroup{Required: true},
 			},
 		},
 	}
@@ -163,9 +163,9 @@ func Test_UsageParser_ParsesUsageWithStaticWord(t *testing.T) {
 		Binary: "blah",
 		Variants: []Grammar{
 			{
-				TokenStaticWord{Name: `action`},
-				TokenSeparator{},
-				TokenPositionalArgument{Value: "<value>"},
+				&TokenStaticWord{Name: `action`},
+				&TokenSeparator{},
+				&TokenPositionalArgument{Value: "<value>"},
 			},
 		},
 	}
@@ -193,11 +193,11 @@ func Test_UsageParser_ParsesUsageWithStaticWordsGroup(t *testing.T) {
 		Binary: "blah",
 		Variants: []Grammar{
 			{
-				TokenGroup{Required: true, Opened: true},
-				TokenStaticWord{Name: `run`},
-				TokenBranch{},
-				TokenStaticWord{Name: `test`},
-				TokenGroup{Required: true},
+				&TokenGroup{Required: true, Opened: true},
+				&TokenStaticWord{Name: `run`},
+				&TokenBranch{},
+				&TokenStaticWord{Name: `test`},
+				&TokenGroup{Required: true},
 			},
 		},
 	}
@@ -278,8 +278,8 @@ func Test_UsageParser_ParsesUsageWithSeveralUsages(t *testing.T) {
 	expected := &Usage{
 		Binary: "blah",
 		Variants: []Grammar{
-			{TokenOption{Name: "--help"}},
-			{TokenOption{Name: "--version"}},
+			{&TokenOption{Name: "--help"}},
+			{&TokenOption{Name: "--version"}},
 		},
 	}
 
@@ -305,9 +305,9 @@ func Test_UsageParser_ParsesMultilineUsage(t *testing.T) {
 		Binary: "blah",
 		Variants: []Grammar{
 			{
-				TokenOption{Name: "--help"},
-				TokenSeparator{},
-				TokenOption{Name: "--version"},
+				&TokenOption{Name: "--help"},
+				&TokenSeparator{},
+				&TokenOption{Name: "--version"},
 			},
 		},
 	}
@@ -351,13 +351,13 @@ func Test_UsageParser_ParsesMultilineUsageStartedWithStaticWord(t *testing.T) {
 		Binary: "blah",
 		Variants: []Grammar{
 			{
-				TokenStaticWord{Name: "action"},
-				TokenSeparator{},
-				TokenPositionalArgument{Value: "<action>"},
-				TokenSeparator{},
-				TokenStaticWord{Name: "value"},
-				TokenSeparator{},
-				TokenPositionalArgument{Value: "<value>"},
+				&TokenStaticWord{Name: "action"},
+				&TokenSeparator{},
+				&TokenPositionalArgument{Value: "<action>"},
+				&TokenSeparator{},
+				&TokenStaticWord{Name: "value"},
+				&TokenSeparator{},
+				&TokenPositionalArgument{Value: "<value>"},
 			},
 		},
 	}
@@ -381,10 +381,10 @@ func Test_UsageParser_ParsesComplexArgumentPatterns(t *testing.T) {
 		Binary: "blah",
 		Variants: []Grammar{
 			{
-				TokenStaticWord{Name: "action"},
-				TokenSeparator{},
-				TokenStaticWord{Name: "/"},
-				TokenPositionalArgument{Value: "<search>"},
+				&TokenStaticWord{Name: "action"},
+				&TokenSeparator{},
+				&TokenStaticWord{Name: "/"},
+				&TokenPositionalArgument{Value: "<search>"},
 			},
 		},
 	}
@@ -406,13 +406,13 @@ func Test_UsageParser_ParsesComplexArgumentPatternsWithGroups(t *testing.T) {
 		Binary: "blah",
 		Variants: []Grammar{
 			{
-				TokenStaticWord{Name: "action"},
-				TokenSeparator{},
-				TokenStaticWord{Name: "key"},
-				TokenGroup{Opened: true},
-				TokenStaticWord{Name: "="},
-				TokenPositionalArgument{Value: "<value>"},
-				TokenGroup{Opened: false},
+				&TokenStaticWord{Name: "action"},
+				&TokenSeparator{},
+				&TokenStaticWord{Name: "key"},
+				&TokenGroup{Opened: true},
+				&TokenStaticWord{Name: "="},
+				&TokenPositionalArgument{Value: "<value>"},
+				&TokenGroup{Opened: false},
 			},
 		},
 	}

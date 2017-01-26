@@ -62,7 +62,7 @@ func (parser *UsageParser) parseBinaryName(
 	matches := scanner.Match(MatcherTokenWord)
 
 	tokens := []Token{
-		TokenSeparator{},
+		&TokenSeparator{},
 	}
 
 	if matches == nil {
@@ -81,7 +81,7 @@ func (parser *UsageParser) parseBinaryName(
 		return nil, nil
 	}
 
-	tokens = append(tokens, TokenStaticWord{Name: matches[0]})
+	tokens = append(tokens, &TokenStaticWord{Name: matches[0]})
 
 	return tokens, nil
 }
@@ -92,14 +92,14 @@ func (parser *UsageParser) parseTokensGroupStart(
 	tokens := []Token{}
 
 	if scanner.Match(MatcherTokenRequiredGroupStart) != nil {
-		tokens = append(tokens, TokenGroup{
+		tokens = append(tokens, &TokenGroup{
 			Opened:   true,
 			Required: true,
 		})
 	}
 
 	if scanner.Match(MatcherTokenOptionalGroupStart) != nil {
-		tokens = append(tokens, TokenGroup{
+		tokens = append(tokens, &TokenGroup{
 			Opened:   true,
 			Required: false,
 		})
@@ -114,14 +114,14 @@ func (parser *UsageParser) parseTokensGroupEnd(
 	tokens := []Token{}
 
 	if scanner.Match(MatcherTokenRequiredGroupEnd) != nil {
-		tokens = append(tokens, TokenGroup{
+		tokens = append(tokens, &TokenGroup{
 			Opened:   false,
 			Required: true,
 		})
 	}
 
 	if scanner.Match(MatcherTokenOptionalGroupEnd) != nil {
-		tokens = append(tokens, TokenGroup{
+		tokens = append(tokens, &TokenGroup{
 			Opened:   false,
 			Required: false,
 		})
@@ -137,7 +137,7 @@ func (parser *UsageParser) parseTokensOptions(
 
 	matches := scanner.Match(MatcherOption)
 	if matches != nil {
-		tokens = append(tokens, TokenOption{
+		tokens = append(tokens, &TokenOption{
 			Name:  matches[1],
 			Value: matches[2],
 		})
@@ -145,14 +145,14 @@ func (parser *UsageParser) parseTokensOptions(
 
 	matches = scanner.Match(MatcherArgument)
 	if matches != nil {
-		tokens = append(tokens, TokenPositionalArgument{
+		tokens = append(tokens, &TokenPositionalArgument{
 			Value: matches[1],
 		})
 	}
 
 	matches = scanner.Match(MatcherTokenWord)
 	if matches != nil {
-		tokens = append(tokens, TokenStaticWord{
+		tokens = append(tokens, &TokenStaticWord{
 			Name: matches[0],
 		})
 	}
@@ -166,7 +166,7 @@ func (parser *UsageParser) parseTokensRepeat(
 	tokens := []Token{}
 
 	if scanner.Match(MatcherTokenRepeat) != nil {
-		tokens = append(tokens, TokenRepeat{})
+		tokens = append(tokens, &TokenRepeat{})
 	}
 
 	return tokens, nil
@@ -178,7 +178,7 @@ func (parser *UsageParser) parseTokensBranch(
 	tokens := []Token{}
 
 	if scanner.Match(MatcherTokenBranch) != nil {
-		tokens = append(tokens, TokenBranch{})
+		tokens = append(tokens, &TokenBranch{})
 
 		scanner.Match(MatcherTokenSeparator)
 	}
@@ -190,7 +190,7 @@ func (parser *UsageParser) parseTokens(scanner *Scanner) ([]Token, error) {
 	tokens := []Token{}
 
 	if scanner.Match(MatcherTokenSeparator) != nil {
-		tokens = append(tokens, TokenSeparator{})
+		tokens = append(tokens, &TokenSeparator{})
 	}
 
 	if scanner.Match(MatcherEndOfLine) != nil {
@@ -212,7 +212,7 @@ func (parser *UsageParser) parseTokens(scanner *Scanner) ([]Token, error) {
 
 	if scanner.Match(MatcherTokenSeparator) != nil {
 		if !empty {
-			tokens = append(tokens, TokenSeparator{})
+			tokens = append(tokens, &TokenSeparator{})
 		}
 	}
 
@@ -295,7 +295,7 @@ func (parser *UsageParser) parseTokens(scanner *Scanner) ([]Token, error) {
 
 	if separator {
 		if scanner.Match(MatcherEndOfLine) == nil {
-			tokens = append(tokens, TokenSeparator{})
+			tokens = append(tokens, &TokenSeparator{})
 		}
 	}
 
