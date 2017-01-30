@@ -23,5 +23,5 @@ func (group *TokenGroup) String() string {
 		pair = pairs[0]
 	}
 
-	return fmt.Sprintf("%s#%d", pair, group.Pair)
+	return fmt.Sprintf("%s:%d", pair, group.Pair)
 }
